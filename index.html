@@ -1,0 +1,1361 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POLYGALOV | Масштабируем успех</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        :root {
+            /* BLACK COLOR SCHEME */
+            --primary-black: #000000;
+            --primary-dark: #171717;
+            --primary-gray: #404040;
+            --accent-gray: #737373;
+            --bg-gray: #f5f5f5;
+            --bg-light-gray: #fafafa;
+            
+            /* Neutral colors */
+            --bg-white: #ffffff;
+            --bg-light: #f8fafc;
+            --text-primary: #000000;
+            --text-secondary: #525252;
+            --text-muted: #737373;
+            --border-light: #e5e5e5;
+            --border-dark: #262626;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --shadow-black: 0 4px 14px 0 rgba(0, 0, 0, 0.25);
+            
+            /* Radius */
+            --radius-sm: 12px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-xl: 32px;
+            --radius-2xl: 48px;
+            
+            /* Transitions */
+            --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-white);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Scrollbar Styling - Black accent */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-light);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-light);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-black);
+        }
+
+        /* FIXED: Header всегда фиксированный, без скачков */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: transparent;
+            border-bottom: 1px solid transparent;
+            transition: all var(--transition-base);
+            padding: 0; /* Убираем padding здесь, переносим в nav-container */
+        }
+
+        /* Состояние при скролле — только изменение фона, без смены position */
+        .header.scrolled {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom-color: rgba(0, 0, 0, 0.08);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.25rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: var(--transition-fast);
+            letter-spacing: 0.02em;
+        }
+
+        .logo:hover {
+            color: var(--primary-gray);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-black), var(--primary-dark));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: var(--transition-fast);
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--primary-black);
+            transition: var(--transition-fast);
+            border-radius: 2px;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-black);
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .mobile-menu {
+            display: none;
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            padding: 2rem;
+            border-bottom: 1px solid var(--border-light);
+            transform: translateY(-100%);
+            opacity: 0;
+            transition: var(--transition-base);
+        }
+
+        .mobile-menu.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .mobile-menu ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .mobile-menu a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: block;
+            padding: 0.5rem 0;
+        }
+
+        /* Hero Section — отступ сверху под фиксированную шапку */
+        .hero-section {
+            position: relative;
+            min-height: 100vh;
+            background: linear-gradient(180deg, var(--bg-white) 0%, var(--bg-light-gray) 100%);
+            border-radius: 0 0 var(--radius-2xl) var(--radius-2xl);
+            margin-bottom: 4rem;
+            overflow: hidden;
+            padding-top: 80px; /* FIXED: отступ под фиксированную шапку */
+        }
+
+        /* Hero Content */
+        .hero-content-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 2rem 8rem; /* Уменьшен верхний padding, т.к. есть padding-top у секции */
+            position: relative;
+            overflow: visible;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .hero-shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.1;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .hero-shape-1 {
+            width: 700px;
+            height: 700px;
+            background: linear-gradient(135deg, #000000, #262626);
+            top: -250px;
+            right: -150px;
+            animation-delay: 0s;
+        }
+
+        .hero-shape-2 {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, #404040, #737373);
+            bottom: -150px;
+            left: -150px;
+            animation-delay: 5s;
+        }
+
+        .hero-shape-3 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, #f5f5f5, #e5e5e5);
+            top: 40%;
+            left: 60%;
+            transform: translate(-50%, -50%);
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.05); }
+            66% { transform: translate(-20px, 20px) scale(0.95); }
+        }
+
+        .hero-inner {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .hero-brand {
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-brand-name {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            color: var(--primary-black);
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .hero-brand-tagline {
+            font-size: clamp(1.25rem, 3vw, 1.75rem);
+            font-weight: 500;
+            color: var(--text-secondary);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.125rem, 2vw, 1.5rem);
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1.125rem 2.5rem;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 1rem;
+            text-decoration: none;
+            transition: all var(--transition-fast);
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--primary-black);
+            color: white;
+            box-shadow: var(--shadow-black);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--text-primary);
+            border: 1.5px solid var(--border-dark);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-gray);
+            border-color: var(--primary-black);
+            color: var(--primary-black);
+            transform: translateY(-2px);
+        }
+
+        /* Section Styles */
+        section {
+            padding: 6rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-label {
+            display: inline-block;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .section-desc {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        /* Advantages Section - Gray bg */
+        .advantages {
+            background: var(--bg-light-gray);
+            border-radius: var(--radius-xl);
+            padding: 4rem 3rem;
+        }
+
+        .advantages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .advantage-card {
+            background: white;
+            padding: 2.5rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-base);
+            border: 1px solid var(--border-light);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .advantage-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .advantage-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        .advantage-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--bg-gray);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-black);
+            margin-bottom: 1.5rem;
+        }
+
+        .advantage-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .advantage-text {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        /* Services Section */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            padding: 3rem;
+            border: 1px solid var(--border-light);
+            transition: all var(--transition-base);
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .service-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-black);
+            transform: scaleX(0);
+            transition: transform var(--transition-base);
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-card:hover {
+            box-shadow: var(--shadow-xl);
+            transform: translateY(-5px);
+            border-color: rgba(0, 0, 0, 0.15);
+        }
+
+        .service-icon {
+            width: 68px;
+            height: 68px;
+            background: var(--primary-black);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .service-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .service-desc {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 1.05rem;
+        }
+
+        .service-tag {
+            display: inline-block;
+            background: var(--bg-gray);
+            color: var(--primary-gray);
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Portfolio Section - Gray bg */
+        .portfolio {
+            background: var(--bg-light-gray);
+            border-radius: var(--radius-xl);
+            padding: 4rem 3rem;
+        }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+
+        .portfolio-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all var(--transition-base);
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .portfolio-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .portfolio-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .portfolio-image {
+            width: 100%;
+            height: 260px;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--bg-gray), #e5e5e5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .portfolio-content {
+            padding: 2rem;
+        }
+
+        .portfolio-type {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .portfolio-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .portfolio-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--primary-black);
+            font-weight: 600;
+            text-decoration: none;
+            transition: gap var(--transition-fast);
+        }
+
+        .portfolio-btn:hover {
+            gap: 0.75rem;
+        }
+
+        /* Contact Section */
+        .contact-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 5rem;
+            align-items: start;
+        }
+
+        .contact-info h3 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .contact-info p {
+            color: var(--text-secondary);
+            margin-bottom: 2.5rem;
+            font-size: 1.2rem;
+            line-height: 1.7;
+        }
+
+        .contact-methods {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .contact-method {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+
+        .contact-method:hover {
+            color: var(--primary-black);
+        }
+
+        .contact-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--bg-gray);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-black);
+            transition: all var(--transition-fast);
+        }
+
+        .contact-method:hover .contact-icon {
+            background: var(--primary-black);
+            color: white;
+        }
+
+        .contact-form {
+            background: white;
+            padding: 3rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-light);
+        }
+
+        .form-group {
+            margin-bottom: 1.75rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 1.125rem 1.5rem;
+            border: 1.5px solid var(--border-light);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all var(--transition-fast);
+            background: var(--bg-light-gray);
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-black);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-textarea {
+            min-height: 140px;
+            resize: vertical;
+        }
+
+        .form-submit {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* Footer - Black */
+        .footer {
+            background: var(--primary-black);
+            color: white;
+            padding: 4rem 2rem;
+            margin-top: 4rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .footer-logo {
+            font-size: 1.75rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            letter-spacing: 0.02em;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2.5rem;
+        }
+
+        .footer-link {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+            font-weight: 500;
+        }
+
+        .footer-link:hover {
+            color: white;
+        }
+
+        /* Animations */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .nav-container {
+                padding: 1rem 1.5rem;
+            }
+
+            .contact-wrapper {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .nav-menu {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+
+            .hero-section {
+                padding-top: 70px; /* Меньше отступ на мобильных */
+            }
+
+            .hero-content-wrapper {
+                padding: 2rem 1.5rem 6rem;
+                min-height: auto;
+            }
+
+            .hero-section {
+                margin-bottom: 2rem;
+                border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+            }
+
+            .advantages-grid,
+            .services-grid,
+            .portfolio-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero-cta {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .contact-form {
+                padding: 1.5rem;
+            }
+
+            section {
+                padding: 4rem 1.5rem;
+            }
+
+            .advantages,
+            .portfolio {
+                padding: 3rem 1.5rem;
+                border-radius: var(--radius-lg);
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* Loading animation */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Yandex.Metrika Counter -->
+    <!-- 
+    ЗАМЕНИТЬ: Вставьте здесь код Яндекс.Метрики
+    <script type="text/javascript" >
+       (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+       m[i].l=1*new Date();
+       for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+       k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+       (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+       ym(XXXXXXXX, "init", {
+            clickmap:true,
+            trackLinks:true,
+            accurateTrackBounce:true,
+            webvisor:true
+       });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/XXXXXXXX" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    -->
+
+    <!-- FIXED: Header всегда фиксированный -->
+    <header class="header" id="header">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <div class="logo-icon">
+                    <i data-lucide="code-2" style="width: 22px; height: 22px;"></i>
+                </div>
+                <span>POLYGALOV</span>
+            </a>
+            
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="#services" class="nav-link">Услуги</a></li>
+                    <li><a href="#advantages" class="nav-link">Преимущества</a></li>
+                    <li><a href="#portfolio" class="nav-link">Портфолио</a></li>
+                    <li><a href="#contact" class="nav-link">Контакты</a></li>
+                </ul>
+            </nav>
+
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Открыть меню">
+                <i data-lucide="menu" style="width: 28px; height: 28px;"></i>
+            </button>
+        </div>
+
+        <div class="mobile-menu" id="mobileMenu">
+            <ul>
+                <li><a href="#services" class="mobile-nav-link">Услуги</a></li>
+                <li><a href="#advantages" class="mobile-nav-link">Преимущества</a></li>
+                <li><a href="#portfolio" class="mobile-nav-link">Портфолио</a></li>
+                <li><a href="#contact" class="mobile-nav-link">Контакты</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- Hero Section — отдельно от шапки с отступом сверху -->
+    <div class="hero-section">
+        <!-- Hero Content -->
+        <div class="hero-content-wrapper">
+            <div class="hero-bg">
+                <div class="hero-shape hero-shape-1"></div>
+                <div class="hero-shape hero-shape-2"></div>
+                <div class="hero-shape hero-shape-3"></div>
+            </div>
+            
+            <div class="hero-inner">
+                <div class="hero-brand fade-in-up">
+                    <h1 class="hero-brand-name">POLYGALOV</h1>
+                    <p class="hero-brand-tagline">Масштабируем успех</p>
+                </div>
+                
+                <p class="hero-subtitle fade-in-up" style="transition-delay: 0.1s;">
+                    Создём сайты под ключ — от одностраничных визиток до многостраничных лендингов. Помогем бизнесу быть заметным в интернете.
+                </p>
+                
+                <div class="hero-cta fade-in-up" style="transition-delay: 0.2s;">
+                    <a href="#contact" class="btn btn-primary">
+                        <span>Обсудить проект</span>
+                        <i data-lucide="arrow-right" style="width: 18px; height: 18px;"></i>
+                    </a>
+                    <a href="#portfolio" class="btn btn-secondary">
+                        <span>Смотреть работы</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advantages Section -->
+    <section id="advantages" class="advantages">
+        <div class="section-header">
+            <span class="section-label">Почему выбирают нас</span>
+            <h2 class="section-title">Наши преимущества</h2>
+            <p class="section-desc">Работаем так, чтобы результат превосходил ожидания</p>
+        </div>
+
+        <div class="advantages-grid">
+            <div class="advantage-card">
+                <div class="advantage-icon">
+                    <i data-lucide="zap" style="width: 28px; height: 28px;"></i>
+                </div>
+                <h3 class="advantage-title">Быстрая разработка</h3>
+                <p class="advantage-text">Сайт готов в сжатые сроки, без затягивания. Чёткие дедлайны и поэтапная сдача проекта.</p>
+            </div>
+
+            <div class="advantage-card">
+                <div class="advantage-icon">
+                    <i data-lucide="user-check" style="width: 28px; height: 28px;"></i>
+                </div>
+                <h3 class="advantage-title">Индивидуальный подход</h3>
+                <p class="advantage-text">Каждый проект делается под конкретную задачу бизнеса. Никаких шаблонных решений.</p>
+            </div>
+
+            <div class="advantage-card">
+                <div class="advantage-icon">
+                    <i data-lucide="smartphone" style="width: 28px; height: 28px;"></i>
+                </div>
+                <h3 class="advantage-title">Адаптивный дизайн</h3>
+                <p class="advantage-text">Сайт отлично выглядит на любых устройствах: телефонах, планшетах, ноутбуках.</p>
+            </div>
+
+            <div class="advantage-card">
+                <div class="advantage-icon">
+                    <i data-lucide="layout" style="width: 28px; height: 28px;"></i>
+                </div>
+                <h3 class="advantage-title">Понятная структура</h3>
+                <p class="advantage-text">Клиенту легко ориентироваться, а поисковые системы — индексировать контент.</p>
+            </div>
+
+            <div class="advantage-card">
+                <div class="advantage-icon">
+                    <i data-lucide="package-check" style="width: 28px; height: 28px;"></i>
+                </div>
+                <h3 class="advantage-title">Работа под ключ</h3>
+                <p class="advantage-text">От идеи до публикации на хостинге и домене. Не нужно ничего делать самостоятельно.</p>
+            </div>
+
+            <div class="advantage-card">
+                <div class="advantage-icon">
+                    <i data-lucide="headphones" style="width: 28px; height: 28px;"></i>
+                </div>
+                <h3 class="advantage-title">Поддержка после сдачи</h3>
+                <p class="advantage-text">Поможем с правками, если что-то нужно изменить. Гарантия на выполненную работу.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services">
+        <div class="section-header">
+            <span class="section-label">Что мы делаем</span>
+            <h2 class="section-title">Услуги</h2>
+            <p class="section-desc">Полный спектр услуг по созданию и развитию сайтов</p>
+        </div>
+
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">
+                    <i data-lucide="file-text" style="width: 28px; height: 28px;"></i>
+                </div>
+                <h3 class="service-title">Сайт-визитка</h3>
+                <p class="service-desc">Идеально для небольших компаний, мастеров, специалистов. Всё самое важное на одной странице: услуги, контакты, преимущества. Быстро, недорого, эффективно.</p>
+                <span class="service-tag">От 1 дня</span>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">
+                    <i data-lucide="layers" style="width: 28px; height: 28px;"></i>
+                </div>
+                <h3 class="service-title">Многостраничный лендинг</h3>
+                <p class="service-desc">Для проектов, которым нужно подробно рассказать о продукте или услуге. Несколько разделов, продуманная структура, призывы к действию на каждом этапе.</p>
+                <span class="service-tag">От 3 дней</span>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">
+                    <i data-lucide="mouse-pointer-click" style="width: 28px; height: 28px;"></i>
+                </div>
+                <h3 class="service-title">Сайт на Tilda</h3>
+                <p class="service-desc">Быстрая сборка на конструкторе, красивый дизайн, удобное управление для клиента. Отличный вариант, если нужен сайт с возможностью самостоятельного редактирования.</p>
+                <span class="service-tag">От 5 дней</span>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">
+                    <i data-lucide="globe" style="width: 28px; height: 28px;"></i>
+                </div>
+                <h3 class="service-title">Публикация сайта</h3>
+                <p class="service-desc">Поможем разместить сайт на хостинге, подключить домен, настроить формы и аналитику. Всё, чтобы сайт заработал и приносил клиентов сразу после запуска.</p>
+                <span class="service-tag">1-2 дня</span>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">
+                    <i data-lucide="settings" style="width: 28px; height: 28px;"></i>
+                </div>
+                <h3 class="service-title">Доработка и поддержка</h3>
+                <p class="service-desc">Внесём изменения в уже готовый сайт, обновим контент, исправим ошибки.</p>
+                <span class="service-tag">По запросу</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="portfolio">
+        <div class="section-header">
+            <span class="section-label">Примеры работ</span>
+            <h2 class="section-title">Портфолио</h2>
+            <p class="section-desc">Реальные проекты для реальных бизнесов</p>
+        </div>
+
+        <div class="portfolio-grid">
+            <!-- ЗАМЕНИТЬ: Замените изображение на реальный скриншот -->
+            <div class="portfolio-card">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #f5f5f5, #e5e5e5);">
+                    <span style="color: #737373; font-weight: 500;">Скриншот проекта</span>
+                    <!-- <img src="path/to/screenshot1.jpg" alt="Стоматология Дентал" style="width: 100%; height: 100%; object-fit: cover;"> -->
+                </div>
+                <div class="portfolio-content">
+                    <div class="portfolio-type">Стоматология — лендинг</div>
+                    <h3 class="portfolio-title">Дентал Про</h3>
+                    <a href="#" class="portfolio-btn">
+                        <span>Смотреть проект</span>
+                        <i data-lucide="arrow-up-right" style="width: 16px; height: 16px;"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- ЗАМЕНИТЬ: Замените изображение на реальный скриншот -->
+            <div class="portfolio-card">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #fafafa, #f0f0f0);">
+                    <span style="color: #737373; font-weight: 500;">Скриншот проекта</span>
+                    <!-- <img src="path/to/screenshot2.jpg" alt="Мастер маникюра" style="width: 100%; height: 100%; object-fit: cover;"> -->
+                </div>
+                <div class="portfolio-content">
+                    <div class="portfolio-type">Мастер маникюра — визитка</div>
+                    <h3 class="portfolio-title">Nail Studio Anna</h3>
+                    <a href="#" class="portfolio-btn">
+                        <span>Смотреть проект</span>
+                        <i data-lucide="arrow-up-right" style="width: 16px; height: 16px;"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- ЗАМЕНИТЬ: Замените изображение на реальный скриншот -->
+            <div class="portfolio-card">
+                <div class="portfolio-image" style="background: linear-gradient(135deg, #f5f5f5, #ebebeb);">
+                    <span style="color: #737373; font-weight: 500;">Скриншот проекта</span>
+                    <!-- <img src="path/to/screenshot3.jpg" alt="Курьерская служба" style="width: 100%; height: 100%; object-fit: cover;"> -->
+                </div>
+                <div class="portfolio-content">
+                    <div class="portfolio-type">Доставка — многостраничный</div>
+                    <h3 class="portfolio-title">Fast Delivery</h3>
+                    <a href="#" class="portfolio-btn">
+                        <span>Смотреть проект</span>
+                        <i data-lucide="arrow-up-right" style="width: 16px; height: 16px;"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact">
+        <div class="contact-wrapper">
+            <div class="contact-info">
+                <span class="section-label">Свяжитесь с нами</span>
+                <h3>Готовы обсудить ваш проект?</h3>
+                <p>Оставьте заявку, и мы свяжемся с вами. Бесплатная консультация и оценка проекта.</p>
+                
+                <div class="contact-methods">
+                    <!-- ЗАМЕНИТЬ: Укажите ваш номер телефона -->
+                    <a href="tel:+79999999999" class="contact-method">
+                        <div class="contact-icon">
+                            <i data-lucide="phone" style="width: 22px; height: 22px;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-primary);">Телефон</div>
+                            <div>+7 (999) 999-99-99</div>
+                        </div>
+                    </a>
+
+                    <!-- ЗАМЕНИТЬ: Укажите ссылку на Telegram -->
+                    <a href="#" class="contact-method" onclick="event.preventDefault(); alert('Замените ссылку на ваш Telegram');">
+                        <div class="contact-icon">
+                            <i data-lucide="send" style="width: 22px; height: 22px;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-primary);">Telegram</div>
+                            <div>@username</div>
+                        </div>
+                    </a>
+
+                    <!-- ЗАМЕНИТЬ: Укажите ссылку на WhatsApp -->
+                    <a href="#" class="contact-method" onclick="event.preventDefault(); alert('Замените ссылку на ваш WhatsApp');">
+                        <div class="contact-icon">
+                            <i data-lucide="message-circle" style="width: 22px; height: 22px;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight: 600; color: var(--text-primary);">WhatsApp</div>
+                            <div>Написать в WhatsApp</div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 
+            ЗАМЕНИТЬ: 
+            1. Зарегистрируйтесь на https://formspree.io/
+            2. Создайте новую форму
+            3. Замените "YOUR_FORM_ID" на ваш ID формы
+            Пример: action="https://formspree.io/f/xnqkvpzy"
+            -->
+            <form class="contact-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+                <div class="form-group">
+                    <label class="form-label" for="name">Ваше имя *</label>
+                    <input type="text" id="name" name="name" class="form-input" placeholder="Иван Иванов" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="phone">Телефон *</label>
+                    <input type="tel" id="phone" name="phone" class="form-input" placeholder="+7 (999) 999-99-99" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="message">Краткое описание задачи</label>
+                    <textarea id="message" name="message" class="form-textarea" placeholder="Расскажите о вашем проекте..."></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary form-submit">
+                    <span>Отправить заявку</span>
+                    <i data-lucide="send" style="width: 18px; height: 18px;"></i>
+                </button>
+
+                <p style="margin-top: 1rem; font-size: 0.875rem; color: var(--text-muted); text-align: center;">
+                    Нажимая кнопку, вы соглашаетесь с политикой конфиденциальности
+                </p>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <i data-lucide="code-2" style="width: 28px; height: 28px;"></i>
+                <span>POLYGALOV</span>
+            </div>
+            
+            <div class="footer-links">
+                <!-- ЗАМЕНИТЬ: Укажите ссылку на политику конфиденциальности -->
+                <a href="#" class="footer-link" onclick="event.preventDefault(); alert('Добавьте ссылку на политику конфиденциальности');">Политика конфиденциальности</a>
+                <span style="color: rgba(255,255,255,0.4);">© 2026 POLYGALOV. Все права защищены.</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Mobile Menu Toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        let isMenuOpen = false;
+
+        mobileMenuBtn.addEventListener('click', () => {
+            isMenuOpen = !isMenuOpen;
+            mobileMenu.classList.toggle('active', isMenuOpen);
+            
+            // Change icon
+            const icon = mobileMenuBtn.querySelector('i');
+            if (isMenuOpen) {
+                icon.setAttribute('data-lucide', 'x');
+            } else {
+                icon.setAttribute('data-lucide', 'menu');
+            }
+            lucide.createIcons();
+        });
+
+        // Close mobile menu on link click
+        document.querySelectorAll('.mobile-nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                isMenuOpen = false;
+                mobileMenu.classList.remove('active');
+                const icon = mobileMenuBtn.querySelector('i');
+                icon.setAttribute('data-lucide', 'menu');
+                lucide.createIcons();
+            });
+        });
+
+        // Header scroll effect — только изменение фона, без скачков
+        const header = document.getElementById('header');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements
+        document.querySelectorAll('.fade-in-up, .advantage-card, .service-card, .portfolio-card').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    const headerOffset = 80; /* Фиксированный отступ для шапки */
+                    const elementPosition = target.getBoundingClientRect().top;
+                    const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+                    window.scrollTo({
+                        top: offsetPosition,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Form submission handling (optional enhancement)
+        const form = document.querySelector('.contact-form');
+        form.addEventListener('submit', function(e) {
+            // Formspree will handle the actual submission
+            // This is just for UX enhancement
+            const btn = form.querySelector('.form-submit');
+            const originalContent = btn.innerHTML;
+            
+            btn.innerHTML = '<span>Отправка...</span>';
+            btn.disabled = true;
+            
+            // Re-enable after submission (Formspree will redirect or show success)
+            setTimeout(() => {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+                lucide.createIcons();
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
